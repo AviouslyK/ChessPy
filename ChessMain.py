@@ -38,11 +38,39 @@ def main():
 
     loadImages() # only do this once
     
+    # for mouse clicks
+    sqSelected = () # last click of user tuple:(row,col)
+    playerClicks = [] # keep track of player clicks (two tuples: start and end)
+
     running = True
     while running:
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
+            elif e.type == p.MOUSEBUTTONDOWN: # do switch to click and drag
+                location = p.mouse.get_pos() # (x,y) location of mouse
+                # get col and row of where we clicked
+                row = location[1]//SQ_SIZE
+                col = location[0]//SQ_SIZE
+
+                # case: user clicks same square twice --> reset
+                if sqSelected == (row,col):
+                    sqSelected = ()
+                    playerClicks = []
+                else:
+                    sqSelected = (row, col)
+                    playerClicks.append(sqSelected) # append for 1st and 2nd clicks
+                
+                # was that user's second click? make a move
+                if len(playerClicks) == 2:
+                    move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
+                    print(move.getChessNotation())
+                    gs.makeMove(move)
+                    # reset user clicks
+                    sqSelected = () 
+                    playerClicks = []
+                    
+
 
         drawGameState(screen, gs)
         clock.tick(MAX_FPS)
