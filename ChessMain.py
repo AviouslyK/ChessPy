@@ -6,7 +6,7 @@ import pygame as p
 import ChessEngine
 
 # Define some constants
-WIDTH = HEIGHT = 400 # can't go too big, images aren't high res
+WIDTH = HEIGHT = 512 # can't go too big, images aren't high res
 DIMENSION = 8 # chess board is 8x8
 SQ_SIZE = HEIGHT // DIMENSION
 MAX_FPS = 15 # for animations
