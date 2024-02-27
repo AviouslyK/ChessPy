@@ -35,18 +35,22 @@ def main():
     # create a game state
     gs = ChessEngine.GameState()
     print(gs.board)
-
     loadImages() # only do this once
+    validMoves = gs.getValidMoves() 
+    moveMade = False # flag for when a move is made
     
     # for mouse clicks
     sqSelected = () # last click of user tuple:(row,col)
     playerClicks = [] # keep track of player clicks (two tuples: start and end)
+    
 
     running = True
     while running:
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
+
+            # mouse handler
             elif e.type == p.MOUSEBUTTONDOWN: # do switch to click and drag
                 location = p.mouse.get_pos() # (x,y) location of mouse
                 # get col and row of where we clicked
@@ -65,13 +69,23 @@ def main():
                 if len(playerClicks) == 2:
                     move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
                     print(move.getChessNotation())
-                    gs.makeMove(move)
+                    if move in validMoves:
+                        gs.makeMove(move)
+                        moveMade = True
                     # reset user clicks
                     sqSelected = () 
                     playerClicks = []
-                    
+            
+            # key handler
+            elif e.type == p.KEYDOWN:
+                if e.key == p.K_z: # undo when 'z' pressed
+                    gs.undoMove()
+                    moveMade = True # regenerate valid moves
 
-
+        if moveMade:
+            validMoves = gs.getValidMoves()
+            moveMade = False
+            
         drawGameState(screen, gs)
         clock.tick(MAX_FPS)
         p.display.flip()
