@@ -17,6 +17,9 @@ class GameState():
             ['wP','wP','wP','wP','wP','wP','wP','wP'],
             ['wR','wN','wB','wQ','wK','wB','wN','wR']]
 
+        self.moveFunctions = {'P': self.getPawnMoves, 'R': self.getRookMoves, 'N': self.getKnightMoves,
+                              'B': self.getBishopMoves, 'Q': self.getQueenMoves, 'K': self.getKingMoves}
+
         self.whiteToMove = True
         self.moveLog = []
     
@@ -57,12 +60,10 @@ class GameState():
                 turn = self.board[r][c][0] # 'b', 'w', or '-'
                 piece = self.board[r][c][1]
 
-                if (turn == 'w' and self.whiteToMove)and (turn == 'b' and not self.whiteToMove):
-    
-                    if piece == 'P':
-                        self.getPawnMoves(r,c, moves)
-                    if piece == 'R':
-                        self.getRookMoves(r,c, moves)
+                # get moves
+                if (turn == 'w' and self.whiteToMove) or (turn == 'b' and not self.whiteToMove):
+                    self.moveFunctions[piece](r, c, moves)
+
         return moves
 
 
@@ -70,9 +71,56 @@ class GameState():
     Get all possible moves for this piece
     ''' 
     def getPawnMoves(self, r, c, moves):
-        
+
+        # white pawn moves
+        if self.whiteToMove: 
+
+            # advance 1 square
+            if self.board[r-1][c] == '--': 
+                moves.append(Move((r,c), (r-1,c), self.board))
+
+                # advance 2 squares
+                if r == 6 and self.board[r-2][c] == '--':
+                    moves.append(Move((r,c), (r-2,c), self.board))
+            
+            # captures
+            if c-1 >= 0: # can't escape board
+                if self.board[r-1][c-1][0] == 'b':
+                    moves.append(Move((r,c), (r-1,c-1), self.board))
+            if c+1 <= 7: # can't escape board
+                if self.board[r-1][c+1][0] == 'b':
+                    moves.append(Move((r,c), (r-1,c+1), self.board))
+
+        # black pawn moves
+        else:
+
+            # advance 1 square
+            if self.board[r+1][c] == '--': 
+                moves.append(Move((r,c), (r+1,c), self.board))
+
+                # advance 2 squares
+                if r == 1 and self.board[r+2][c] == '--':
+                    moves.append(Move((r,c), (r+2,c), self.board))
+            
+            # captures
+            if c-1 >= 0: # can't escape board
+                if self.board[r+1][c-1][0] == 'w':
+                    moves.append(Move((r,c), (r+1,c-1), self.board))
+            if c+1 <= 7: # can't escape board
+                if self.board[r+1][c+1][0] == 'w':
+                    moves.append(Move((r,c), (r+1,c+1), self.board))
+
 
     def getRookMoves(self, r, c, moves):
+        pass
+    
+    def getKnightMoves(self, r, c, moves):
+        pass
+    def getBishopMoves(self, r, c, moves):
+        pass
+    def getQueenMoves(self, r, c, moves):
+        pass
+    def getKingMoves(self, r, c, moves):
         pass
 
 '''
