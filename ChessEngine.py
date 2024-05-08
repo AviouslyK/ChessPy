@@ -134,8 +134,27 @@ class GameState():
 
     def getKnightMoves(self, r, c, moves):
         pass
+
     def getBishopMoves(self, r, c, moves):
-        pass
+
+        for delta_r, delta_c in [(1, 1), (1, -1), (-1, -1), (-1, 1)]: # up/down left, up/down right
+            for i in range(1,7):
+                new_r = r + delta_r * i
+                new_c = c + delta_c * i
+
+                # can't escape board
+                if (new_r < 0) or (new_r > 7) or (new_c < 0) or (new_c > 7):
+                    break
+
+                # piece blocking
+                if self.board[new_r][new_c] != '--': 
+                    # add move if capturing
+                    if (self.board[new_r][new_c][0] == 'b' and self.whiteToMove) or (self.board[new_r][new_c][0] == 'w' and not self.whiteToMove):
+                        moves.append(Move((r,c), (new_r, new_c), self.board))
+                    break
+
+                moves.append(Move((r,c), (new_r, new_c), self.board))
+
     def getQueenMoves(self, r, c, moves):
         pass
     def getKingMoves(self, r, c, moves):
