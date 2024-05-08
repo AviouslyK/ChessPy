@@ -24,24 +24,6 @@ class GameState():
         self.moveLog = []
     
     '''
-    Helper for repetitive code for adding moves. These are all orthogonal multi-square moves (rook, some queen)
-    '''
-    def add_moves(self, moves, delta_r, delta_c, r, c):
-        for i in range(1, 8):
-            r_new = r + i * delta_r
-            c_new = c + i * delta_c
-
-            if not (0 <= r_new < 8) or not (0 <= c_new < 8):  # Check if within board bounds
-                break
-            elif self.board[r_new][c_new] == '--':
-                moves.append(Move((r, c), (r_new, c_new), self.board))
-            elif self.board[r_new][c_new][0] == 'b':
-                moves.append(Move((r, c), (r_new, c_new), self.board))
-                break
-            else:
-                break
-
-    '''
     takes a Move and executes it.
     excludes castling, promotion, en-passant
     '''
@@ -130,11 +112,26 @@ class GameState():
 
 
     def getRookMoves(self, r, c, moves):
-        
-        if self.whiteToMove: # white rook moves
-            for delta_r, delta_c in [(1, 0), (-1, 0), (0, 1), (0, -1)]: # down, up, right, left
-                self.add_moves(moves, delta_r, delta_c, r, c)
-           
+
+        for delta_r, delta_c in [(1, 0), (-1, 0), (0, -1), (0, 1)]: # up/down (depends on w or b) left right
+            for i in range(1,7):
+                new_r = r + delta_r * i
+                new_c = c + delta_c * i
+
+                # can't escape board
+                if (new_r < 0) or (new_r > 7) or (new_c < 0) or (new_c > 7):
+                    break
+
+                # piece blocking
+                if self.board[new_r][new_c] != '--': 
+                    # add move if capturing
+                    if (self.board[new_r][new_c][0] == 'b' and self.whiteToMove) or (self.board[new_r][new_c][0] == 'w' and not self.whiteToMove):
+                        moves.append(Move((r,c), (new_r, new_c), self.board))
+                    break
+
+                moves.append(Move((r,c), (new_r, new_c), self.board))
+    
+
     def getKnightMoves(self, r, c, moves):
         pass
     def getBishopMoves(self, r, c, moves):
